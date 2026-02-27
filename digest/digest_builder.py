@@ -190,6 +190,7 @@ class DigestBuilder:
                     lines.append("핵심 포인트:")
                     for point in item.key_points:
                         lines.append(f"  • {point}")
+                lines.append(f"원문: https://mail.google.com/mail/u/0/#all/{item.message_id}")
                 lines.append("")
 
         lines.append("=" * 60)

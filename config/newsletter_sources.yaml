@@ -1,0 +1,47 @@
+# newsletter_sources.yaml
+# ---------------------------------------------------------------
+# Known newsletter sender domains and subject-line patterns used
+# to identify newsletter emails in the inbox.
+# ---------------------------------------------------------------
+
+# Sending domains associated with newsletter platforms
+domains:
+  # --- Global platforms ---
+  - substack.com
+  - mailchimp.com
+  - beehiiv.com
+  - convertkit.com
+  - buttondown.email
+  - medium.com
+  - revue.co
+  - ghost.io
+  - sendgrid.net
+  - constantcontact.com
+  - campaignmonitor.com
+  # --- Korean newsletter platforms ---
+  - stibee.com
+  - maily.so
+  - longblack.co
+  - maeil-mail.kr
+  - now.weekly.im
+  - letterplace.io
+
+# Subject-line patterns (Python-compatible regular expressions).
+# An email whose subject matches ANY of these is treated as a newsletter.
+subject_patterns:
+  # --- English patterns ---
+  - "\\[.*?Newsletter\\]"
+  - "\\[Weekly\\]"
+  - "\\[Daily\\]"
+  - "Daily Digest"
+  - "Weekly Digest"
+  - "Issue #\\d+"
+  - "\\[Digest\\]"
+  # --- Korean patterns ---
+  - "\\[.*?레터\\]"
+  - "\\[.*?뉴스레터\\]"
+  - "\\[매일메일\\]"
+  - "모닝 브리핑"
+  - "모닝브리핑"
+  - "위클리"
+  - "뉴스레터"

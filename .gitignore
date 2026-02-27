@@ -1,0 +1,24 @@
+# 환경설정 (서버에서 직접 생성)
+.env
+
+# Gmail OAuth 민감 파일 (서버에 직접 복사)
+data/token.json
+data/credentials.json
+
+# 데이터 & 로그
+data/*.db
+data/*.db-shm
+data/*.db-wal
+logs/
+
+# Python
+*.pyc
+__pycache__/
+.venv/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Docker
+docker-compose.override.yml

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Unique reverse-DNS label for this launchd job -->
+  <key>Label</key>
+  <string>com.hooeni.mailing-summary</string>
+
+  <!-- Command to execute -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/hooeni/SideWorkspace/mailing_summary/scheduler/run_digest.sh</string>
+  </array>
+
+  <!-- Run every day at 07:00 local time -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>7</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <!-- Do NOT run immediately when the plist is loaded -->
+  <key>RunAtLoad</key>
+  <false/>
+
+  <!-- Standard output log -->
+  <key>StandardOutPath</key>
+  <string>/Users/hooeni/SideWorkspace/mailing_summary/logs/launchd_stdout.log</string>
+
+  <!-- Standard error log -->
+  <key>StandardErrorPath</key>
+  <string>/Users/hooeni/SideWorkspace/mailing_summary/logs/launchd_stderr.log</string>
+
+  <!-- Restart automatically if the job exits with a non-zero code -->
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+</dict>
+</plist>

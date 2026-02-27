@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.git/
+
+# 민감 파일 - 볼륨 마운트로 주입
+.env
+data/token.json
+data/credentials.json
+data/*.db
+
+# 로그 - 볼륨으로 관리
+logs/
+
+# macOS 스케줄러 (서버에서 불필요)
+scheduler/com.mailing-summary.plist
+
+# 개발용
+tests/
+*.egg-info/
+dist/
+build/

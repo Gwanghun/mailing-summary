@@ -1,0 +1,16 @@
+services:
+  mailing-summary:
+    build: .
+    container_name: mailing-summary
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # 민감 파일: 서버에서 직접 관리 (Git에 포함되지 않음)
+      - ./data/credentials.json:/app/data/credentials.json:ro
+      - ./data/token.json:/app/data/token.json
+      # 데이터 영속성
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - TZ=Asia/Seoul

@@ -68,6 +68,8 @@ class GmailClient:
         self._token_path = token_path
         self._environment = environment
         self._service: Any = None  # set by build_service()
+        self._label_cache: dict[str, str] = {}  # lowercase name → label ID
+        self._labels_loaded: bool = False
 
     # ------------------------------------------------------------------
     # Initialisation
@@ -162,22 +164,36 @@ class GmailClient:
     def create_label_if_not_exists(self, label_name: str) -> str:
         """Return the label ID for *label_name*, creating it if necessary.
 
+        Uses an internal cache to avoid redundant ``labels.list`` API calls.
+        For nested labels (containing ``/``), the parent label is created
+        first to ensure the hierarchy exists.
+
         Args:
-            label_name: Display name of the label (e.g. ``"Newsletter"``).
+            label_name: Display name of the label (e.g. ``"Newsletter/AI"``).
 
         Returns:
             The Gmail label ID string.
         """
         self._ensure_service()
 
-        existing = self._with_retry(
-            lambda: self._service.users().labels().list(userId="me").execute()
-        )
-        for label in existing.get("labels", []):
-            if label["name"].lower() == label_name.lower():
-                logger.debug("Label %r already exists (id=%s).", label_name, label["id"])
-                return label["id"]
+        key = label_name.lower()
 
+        # 1) 캐시에서 먼저 확인
+        if key in self._label_cache:
+            return self._label_cache[key]
+
+        # 2) 최초 호출 시 전체 라벨 목록을 캐시에 로드
+        if not self._labels_loaded:
+            self._load_labels()
+            if key in self._label_cache:
+                return self._label_cache[key]
+
+        # 3) 중첩 라벨인 경우 부모 라벨부터 생성
+        if "/" in label_name:
+            parent = label_name.rsplit("/", 1)[0]
+            self.create_label_if_not_exists(parent)
+
+        # 4) 라벨 생성
         created = self._with_retry(
             lambda: (
                 self._service.users()
@@ -187,7 +203,19 @@ class GmailClient:
             )
         )
         logger.info("Created label %r (id=%s).", label_name, created["id"])
+        self._label_cache[key] = created["id"]
         return created["id"]
+
+    def _load_labels(self) -> None:
+        """Fetch all labels from Gmail and populate the internal cache."""
+        self._ensure_service()
+        result = self._with_retry(
+            lambda: self._service.users().labels().list(userId="me").execute()
+        )
+        for label in result.get("labels", []):
+            self._label_cache[label["name"].lower()] = label["id"]
+        self._labels_loaded = True
+        logger.debug("Loaded %d labels into cache.", len(self._label_cache))
 
     def add_labels(self, message_ids: list[str], label_ids: list[str]) -> None:
         """Add *label_ids* to each message in *message_ids*.

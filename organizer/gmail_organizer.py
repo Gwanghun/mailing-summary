@@ -63,8 +63,9 @@ class GmailOrganizer:
 
     정리 정책
     ---------
-    - 중요도 >= 4 : 라벨만 추가, 받은편지함 유지 (중요한 건 직접 확인)
-    - 중요도 1–3 : 라벨 추가 + 읽음 처리 + 아카이브
+    - 모든 요약된 메일 : 라벨 추가 + 읽음 처리
+    - 중요도 >= 4 : 받은편지함 유지 (직접 확인)
+    - 중요도 1–3 : 아카이브
 
     Parameters
     ----------
@@ -127,7 +128,22 @@ class GmailOrganizer:
                     exc,
                 )
 
-            # 2) 중요도에 따른 처리 분기
+            # 2) 요약된 모든 메일을 읽음 처리
+            try:
+                self._gmail.mark_as_read(message_ids=[result.message_id])
+                stats.read_marked += 1
+                logger.debug(
+                    "읽음 처리 — message_id=%s",
+                    result.message_id,
+                )
+            except Exception as exc:  # pylint: disable=broad-except
+                logger.warning(
+                    "읽음 처리 실패 — message_id=%s | 오류: %s",
+                    result.message_id,
+                    exc,
+                )
+
+            # 3) 중요도에 따른 아카이브 분기
             if result.importance_score >= _INBOX_THRESHOLD:
                 # 중요도 4, 5: 받은편지함 유지 (직접 확인 필요)
                 stats.kept_in_inbox += 1
@@ -137,21 +153,7 @@ class GmailOrganizer:
                     result.message_id,
                 )
             else:
-                # 중요도 1–3: 읽음 처리 + 아카이브
-                try:
-                    self._gmail.mark_as_read(message_ids=[result.message_id])
-                    stats.read_marked += 1
-                    logger.debug(
-                        "읽음 처리 — message_id=%s",
-                        result.message_id,
-                    )
-                except Exception as exc:  # pylint: disable=broad-except
-                    logger.warning(
-                        "읽음 처리 실패 — message_id=%s | 오류: %s",
-                        result.message_id,
-                        exc,
-                    )
-
+                # 중요도 1–3: 아카이브
                 try:
                     self._gmail.archive(message_ids=[result.message_id])
                     stats.archived += 1

@@ -30,7 +30,7 @@ jobs:
         run: mkdir -p data logs
 
       - name: Restore Google OAuth token
-        run: echo "${{ secrets.GOOGLE_TOKEN_JSON }}" | base64 -d > data/token.json
+        run: echo '${{ secrets.GOOGLE_TOKEN_JSON }}' > data/token.json
 
       - name: Run digest pipeline
         env:
